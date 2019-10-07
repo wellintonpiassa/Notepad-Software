@@ -5,6 +5,8 @@ HWND text_box;
 char text[2000];
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    DWORD text_size;
+    int window_width, window_height; 
     switch(msg) {
         case WM_CREATE:
             // Cria uma janela de texto, capaz de escrever em múltiplas linhas
@@ -16,6 +18,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_AUTOVSCROLL, 
                 10, 10, 760, 530,
                 hwnd, NULL, NULL, NULL);
+            break;
+        case WM_SIZE:
+            // Recebe o comprimento e altura da janela
+            window_width = LOWORD(lParam);
+            window_height = HIWORD(lParam);
+            // Atualiza o tamanho da caixa de texto
+            MoveWindow (text_box, 0, 0, window_width, window_height,1);
+            ShowWindow(text_box,SW_SHOWNORMAL);
             break;
         case WM_CLOSE:
             DestroyWindow(hwnd);
