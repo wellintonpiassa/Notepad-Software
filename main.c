@@ -1,24 +1,53 @@
 #include <windows.h>
 
-// gcc main.c -lComdlg32 
+// gcc main.c -lComdlg32
 HWND text_box;
+
 char text[2000];
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     DWORD text_size;
-    int window_width, window_height; 
+    HWND hMenu, sMenu, menuP;
+    int window_width, window_height;
     switch(msg) {
         case WM_CREATE:
             // Cria uma janela de texto, capaz de escrever em múltiplas linhas
             // e mover-se na horizontal e vertical
-            text_box = CreateWindowEx(
+                text_box = CreateWindowEx(
                 WS_EX_CLIENTEDGE,
                 "EDIT",
                 "",
-                WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_AUTOVSCROLL, 
+                WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_AUTOVSCROLL,
                 10, 10, 760, 530,
                 hwnd, NULL, NULL, NULL);
-            break;
+
+            //CRIA A BARRA DE MENU DO ARQUIVO
+                menuP = CreateMenu();
+                sMenu = CreateMenu();
+
+            //OPCAO DO MENU
+                AppendMenu(menuP, MF_POPUP, (UINT_PTR) sMenu, "Options");
+
+            //CRIA O SUB-MENU DA OPÇÃO "OPTIONS"
+                AppendMenu(sMenu, MF_STRING, 1, "Load");
+                AppendMenu(sMenu, MF_STRING, 2, "Save");
+                AppendMenu(sMenu, MF_STRING, 3, "Exit");
+
+                SetMenu(hwnd, menuP);
+                break;
+
+        case WM_COMMAND:
+                if(LOWORD(wParam) == 1)
+
+
+                if(LOWORD(wParam) == 2)
+                    CreateWindowW(L"Button", L"Save File", WS_VISIBLE | WS_CHILD, 10,10,150,36,
+                                  hwnd, (HMENU)2, NULL, NULL);
+
+
+                if(LOWORD(wParam) == 3)
+                    DestroyWindow(hwnd);
+
         case WM_SIZE:
             // Recebe o comprimento e altura da janela
             window_width = LOWORD(lParam);
@@ -39,6 +68,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
+//MAIN
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     const char window_class_name[] = "Editor";
     WNDCLASSEX wc;
@@ -58,6 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
     wc.lpszMenuName = NULL;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
 
     // Registra a janela com o sistema
     if(!RegisterClassEx(&wc)) {
@@ -81,6 +112,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     ShowWindow(hwnd, nCmdShow);
+
+    //addmenus(hwnd);
+
+
 
     // Recebe e transmite as ações do usuário
     while(GetMessage(&msg, NULL, 0, 0) > 0) {
