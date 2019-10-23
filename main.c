@@ -10,7 +10,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     HWND hMenu, sMenu, menuP;
     int window_width, window_height;
     switch(msg) {
+        case WM_COMMAND:
+            switch(wParam)
+            {
+                case 1:
+                    MessageBeep(MB_OK);
+                    break;
+
+                case 2:
+                    MessageBeep(MB_OK);
+                    break;
+
+                case 3:
+                    DestroyWindow(hwnd);
+                    break;
+            }
+
+
         case WM_CREATE:
+            //Função que executa a barra de menu
+            addmenus(hwnd);
             // Cria uma janela de texto, capaz de escrever em múltiplas linhas
             // e mover-se na horizontal e vertical
                 text_box = CreateWindowEx(
@@ -21,33 +40,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 10, 10, 760, 530,
                 hwnd, NULL, NULL, NULL);
 
-            //CRIA A BARRA DE MENU DO ARQUIVO
-                menuP = CreateMenu();
-                sMenu = CreateMenu();
-
-            //OPCAO DO MENU
-                AppendMenu(menuP, MF_POPUP, (UINT_PTR) sMenu, "Options");
-
-            //CRIA O SUB-MENU DA OPÇÃO "OPTIONS"
-                AppendMenu(sMenu, MF_STRING, 1, "Load");
-                AppendMenu(sMenu, MF_STRING, 2, "Save");
-                AppendMenu(sMenu, MF_STRING, 3, "Exit");
-
-                SetMenu(hwnd, menuP);
-                break;
-
-        case WM_COMMAND:
-                if(LOWORD(wParam) == 1)
-
-
-                if(LOWORD(wParam) == 2)
-                    CreateWindowW(L"Button", L"Save File", WS_VISIBLE | WS_CHILD, 10,10,150,36,
-                                  hwnd, (HMENU)2, NULL, NULL);
-
-
-                if(LOWORD(wParam) == 3)
-                    DestroyWindow(hwnd);
-
         case WM_SIZE:
             // Recebe o comprimento e altura da janela
             window_width = LOWORD(lParam);
@@ -56,9 +48,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             MoveWindow (text_box, 0, 0, window_width, window_height,1);
             ShowWindow(text_box,SW_SHOWNORMAL);
             break;
+
         case WM_CLOSE:
             DestroyWindow(hwnd);
             break;
+
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
@@ -66,6 +60,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return DefWindowProc(hwnd, msg, wParam, lParam);
     }
     return 0;
+}
+
+void addmenus(HWND hwnd)
+{
+    HMENU hmenu;
+
+    hmenu = CreateMenu();
+
+    AppendMenu(hmenu, MF_POPUP, 1, "Load");
+    AppendMenu(hmenu, MF_POPUP, 2, "Save");
+    AppendMenu(hmenu, MF_POPUP, 3, "Exit");
+
+    SetMenu(hwnd, hmenu);
 }
 
 //MAIN
@@ -112,10 +119,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     ShowWindow(hwnd, nCmdShow);
-
-    //addmenus(hwnd);
-
-
 
     // Recebe e transmite as ações do usuário
     while(GetMessage(&msg, NULL, 0, 0) > 0) {
