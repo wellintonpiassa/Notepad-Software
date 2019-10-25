@@ -1,4 +1,6 @@
 #include <windows.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // gcc main.c -lComdlg32
 HWND text_box;
@@ -6,6 +8,7 @@ HWND text_box;
 char text[2000];
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    void save_file(HWND hwnd);
     DWORD text_size;
     HWND hMenu, sMenu, menuP;
     int window_width, window_height;
@@ -18,7 +21,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                     break;
 
                 case 2:
-                    MessageBeep(MB_OK);
+                    save_file(hwnd);
                     break;
 
                 case 3:
@@ -60,6 +63,41 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return DefWindowProc(hwnd, msg, wParam, lParam);
     }
     return 0;
+}
+
+void write_file(char *path)
+{
+    FILE *file;
+    file = fopen(path, "w");
+
+    int size = GetWindowTextLength(text_box);
+    char *data = (char *)malloc(size+1);
+    GetWindowText(text_box, data, size+1);
+
+    fwrite(data, size+1, 1, file);
+
+    fclose(file);
+}
+
+void save_file(HWND hwnd)
+{
+    OPENFILENAME ofn;
+
+    char file_name[100];
+
+    ZeroMemory(&ofn, sizeof(OPENFILENAME));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = file_name;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = 100;
+    ofn.lpstrFilter = "Text File\0*.txt\0";
+    ofn.nFilterIndex = 1;
+
+    GetSaveFileName(&ofn);
+
+    write_file(ofn.lpstrFile);
 }
 
 void addmenus(HWND hwnd)
