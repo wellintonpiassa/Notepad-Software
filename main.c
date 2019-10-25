@@ -7,6 +7,19 @@ HWND text_box;
 
 char text[2000];
 
+void addmenus(HWND hwnd)
+{
+    HMENU hmenu;
+
+    hmenu = CreateMenu();
+
+    AppendMenu(hmenu, MF_POPUP, 1, "Load");
+    AppendMenu(hmenu, MF_POPUP, 2, "Save");
+    AppendMenu(hmenu, MF_POPUP, 3, "Exit");
+
+    SetMenu(hwnd, hmenu);
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     void save_file(HWND hwnd);
     DWORD text_size;
@@ -28,20 +41,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                     DestroyWindow(hwnd);
                     break;
             }
-
+            break;
 
         case WM_CREATE:
             //Função que executa a barra de menu
             addmenus(hwnd);
             // Cria uma janela de texto, capaz de escrever em múltiplas linhas
             // e mover-se na horizontal e vertical
-                text_box = CreateWindowEx(
-                WS_EX_CLIENTEDGE,
-                "EDIT",
-                "",
-                WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_AUTOVSCROLL,
-                10, 10, 760, 530,
-                hwnd, NULL, NULL, NULL);
+            text_box = CreateWindowEx(
+            WS_EX_CLIENTEDGE,
+            "EDIT",
+            "",
+            WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|ES_MULTILINE|ES_AUTOHSCROLL|ES_AUTOVSCROLL,
+            10, 10, 760, 530,
+            hwnd, NULL, NULL, NULL);
+            break;
 
         case WM_SIZE:
             // Recebe o comprimento e altura da janela
@@ -98,19 +112,6 @@ void save_file(HWND hwnd)
     GetSaveFileName(&ofn);
 
     write_file(ofn.lpstrFile);
-}
-
-void addmenus(HWND hwnd)
-{
-    HMENU hmenu;
-
-    hmenu = CreateMenu();
-
-    AppendMenu(hmenu, MF_POPUP, 1, "Load");
-    AppendMenu(hmenu, MF_POPUP, 2, "Save");
-    AppendMenu(hmenu, MF_POPUP, 3, "Exit");
-
-    SetMenu(hwnd, hmenu);
 }
 
 //MAIN
