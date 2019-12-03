@@ -7,6 +7,7 @@ HWND text_box;
 
 char text[2000];
 
+//Função que acescenta a barra de menu na janela
 void addmenus(HWND hwnd)
 {
     HMENU hmenu;
@@ -20,17 +21,20 @@ void addmenus(HWND hwnd)
     SetMenu(hwnd, hmenu);
 }
 
+//Função contendo os processos do bloco de notas
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     void save_file(HWND hwnd);
+    void open_file(HWND hwnd);
     DWORD text_size;
     HWND hMenu, sMenu, menuP;
     int window_width, window_height;
     switch(msg) {
+        //Comandos disponiveis na janela
         case WM_COMMAND:
             switch(wParam)
             {
                 case 1:
-                    MessageBeep(MB_OK);
+                    open_file(hwnd);
                     break;
 
                 case 2:
@@ -67,6 +71,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
 
         case WM_CLOSE:
+            //Destrói a janela do bloco de notas
             DestroyWindow(hwnd);
             break;
 
@@ -79,6 +84,47 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
+//Lê o arquivo e printa na janela do bloco de notas
+void display_file(char *path)
+{
+    FILE *file;
+    file = fopen(path, "r");
+
+    fseek(file, 0, SEEK_END);
+    int size = ftell(file);
+    rewind(file);
+    char *data = (char *)malloc(size+1);
+    fread(data, size, 1, file);
+    data[size] = '\0';
+
+    SetWindowText(text_box, data);
+
+    fclose(file);
+}
+
+//Função que executa a abertura da janela para escolha do arquivo que deseja abrir
+void open_file(HWND hwnd)
+{
+    OPENFILENAME ofn;
+
+    char file_name[100];
+
+    ZeroMemory(&ofn, sizeof(OPENFILENAME));
+
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = file_name;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = 100;
+    ofn.lpstrFilter = "All files\0*.*\0Text files\0*.TXT\0";
+    ofn.nFilterIndex = 1;
+
+    GetOpenFileName(&ofn);
+
+    display_file(ofn.lpstrFile);
+}
+
+//Função para transferir o que está na janela do bloco de notas para o arquivo
 void write_file(char *path)
 {
     FILE *file;
@@ -93,6 +139,7 @@ void write_file(char *path)
     fclose(file);
 }
 
+//Função que abre a tela para escolher o diretorio que deseja salvar
 void save_file(HWND hwnd)
 {
     OPENFILENAME ofn;
@@ -114,7 +161,7 @@ void save_file(HWND hwnd)
     write_file(ofn.lpstrFile);
 }
 
-//MAIN
+//Função principal (main)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     const char window_class_name[] = "Editor";
     WNDCLASSEX wc;
